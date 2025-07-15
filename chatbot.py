@@ -1,6 +1,8 @@
 import os
 import requests
 import sys
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 SYSTEM_PROMPT = ("You are a helpful assistant. Only answer questions related to finance or college. "
                  "If the question is not about finance or college, politely refuse to answer.\n")
@@ -17,6 +19,8 @@ except ImportError:
 
 AZURE_OPENAI_API_VERSION = "2023-05-15"  # Default version
 
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 def azure_openai_response(prompt):
     if not (AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT):
@@ -42,16 +46,12 @@ def azure_openai_response(prompt):
     except Exception as e:
         return f"[Error calling Azure OpenAI API: {e}]"
 
-
-def main():
-    print("Chatbot is running. Type 'exit' to quit.")
-    while True:
-        user_input = input("You: ")
-        if user_input.lower() == 'exit':
-            print("Goodbye!")
-            break
-        response = azure_openai_response(user_input)
-        print(f"Azure: {response}")
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    user_input = data.get('message', '')
+    response = azure_openai_response(user_input)
+    return jsonify({'response': response})
 
 if __name__ == "__main__":
-    main() 
+    app.run(host="0.0.0.0", port=5000, debug=True) 
