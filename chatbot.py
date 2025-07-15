@@ -1,14 +1,21 @@
 import os
 import requests
+import sys
 
 SYSTEM_PROMPT = ("You are a helpful assistant. Only answer questions related to finance or college. "
                  "If the question is not about finance or college, politely refuse to answer.\n")
 
-# Read Azure OpenAI configuration from environment variables
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")  # e.g., https://YOUR_RESOURCE_NAME.openai.azure.com/
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY")
-AZURE_OPENAI_DEPLOYMENT = os.getenv("AZURE_OPENAI_DEPLOYMENT")  # e.g., 'gpt-35-turbo' or your deployment name
-AZURE_OPENAI_API_VERSION = os.getenv("AZURE_OPENAI_API_VERSION", "2023-05-15")  # Default version
+SECRET_PATH = r"C:\Users\ahmtt\Documents\VS\API KEY"
+if SECRET_PATH not in sys.path:
+    sys.path.insert(0, SECRET_PATH)
+try:
+    from secret import AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_DEPLOYMENT, AZURE_OPENAI_API_KEY
+except ImportError:
+    AZURE_OPENAI_ENDPOINT = None
+    AZURE_OPENAI_DEPLOYMENT = None
+    AZURE_OPENAI_API_KEY = None
+
+AZURE_OPENAI_API_VERSION = "2023-05-15"  # Default version
 
 
 def azure_openai_response(prompt):
